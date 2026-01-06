@@ -247,7 +247,8 @@ public partial class ProtoFluxOverhaul
 						newMaterial.Sidedness.Value = originalMaterial.Sidedness.Value;
 						newMaterial.UseVertexColors.Value = originalMaterial.UseVertexColors.Value;
 						newMaterial.BlendMode.Value = originalMaterial.BlendMode.Value;
-						newMaterial.ZWrite.Value = originalMaterial.ZWrite.Value;
+						// newMaterial.ZWrite.Value = originalMaterial.ZWrite.Value;
+						newMaterial.ZWrite.Value = ZWrite.Off;
 						newMaterial.NearTextureScale.Value = originalMaterial.NearTextureScale.Value;
 						newMaterial.NearTextureOffset.Value = originalMaterial.NearTextureOffset.Value;
 						newMaterial.FarTextureScale.Value = originalMaterial.FarTextureScale.Value;
