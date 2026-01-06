@@ -1,7 +1,7 @@
 ﻿﻿using System.Reflection;
 
-[assembly: AssemblyTitle("ProtoFluxOverhaul")]
-[assembly: AssemblyProduct("ProtoFluxOverhaul")]
+[assembly: AssemblyTitle("ProtoFluxOverhaul_Wires")]
+[assembly: AssemblyProduct("ProtoFluxOverhaul_Wires")]
 [assembly: AssemblyDescription("Overhauled ProtoFlux Customizations!")]
 [assembly: AssemblyCompany("Dexy")]
 [assembly: AssemblyCopyright("Copyright © 2025 Dexy")]

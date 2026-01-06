@@ -60,39 +60,6 @@ public partial class ProtoFluxOverhaul
 						Logger.LogWire("Cleanup", "Preserved PFO child slot for transient wire teardown (likely pack/unpack)");
 					}
 				}
-
-				// Skip if disabled
-				if (!Config.GetValue(ENABLED))
-				{
-					Logger.LogWire("Delete", "Wire delete sound skipped: Mod disabled");
-					return;
-				}
-
-				// Skip if required components are missing
-				if (__instance == null || !__instance.Enabled || __instance.Slot == null)
-				{
-					Logger.LogWire("Delete", "Wire delete sound skipped: Missing components");
-					return;
-				}
-
-				// Only process if this is an actual user deletion (DeleteHighlight = true)
-				if (!__instance.DeleteHighlight.Value)
-				{
-					// This is a system cleanup, not a user deletion - skip silently
-					return;
-				}
-
-				// Play delete sound if we have permission for user-initiated deletion
-				bool hasPermission = HasPermission(__instance);
-				if (hasPermission)
-				{
-					Logger.LogWire("Delete", $"Playing wire delete sound at position {__instance.Slot.GlobalPosition}");
-					ProtoFluxSounds.OnWireDeleted(__instance.World, __instance.Slot.GlobalPosition);
-				}
-				else
-				{
-					Logger.LogWire("Delete", $"Wire delete sound skipped: Insufficient permissions for user {__instance.LocalUser?.UserName}");
-				}
 			}
 			catch (Exception e)
 			{

@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<RootNamespace>ProtoFluxOverhaul</RootNamespace>
-		<AssemblyName>ProtoFluxOverhaul</AssemblyName>
+		<RootNamespace>ProtoFluxOverhaul_Wires</RootNamespace>
+		<AssemblyName>ProtoFluxOverhaul_Wires</AssemblyName>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 		<TargetFramework>net10.0</TargetFramework>
 		<FileAlignment>512</FileAlignment>
@@ -19,7 +19,8 @@
 		<!-- If you don't want to provide a ResonitePath in dotnet build, you can specify one here -->
 		<ResonitePath>B:\SteamLibrary\steamapps\common\Resonite</ResonitePath>
 		<!-- Fallback paths if the above doesn't exist -->
-		<ResonitePath Condition="Exists('B:\SteamLibrary\steamapps\common\Resonite\')">B:\SteamLibrary\steamapps\common\Resonite\</ResonitePath>
+		<ResonitePath Condition="Exists('D:\SteamLibrary\steamapps\common\Resonite\')">D:\SteamLibrary\steamapps\common\Resonite\</ResonitePath>
+		<ResonitePath Condition="Exists('E:\SteamLibrary\steamapps\common\Resonite\')">E:\SteamLibrary\steamapps\common\Resonite\</ResonitePath>
 	</PropertyGroup>
 
 	<ItemGroup>
