@@ -2,7 +2,6 @@ using System;
 using FrooxEngine;
 using FrooxEngine.ProtoFlux;
 using HarmonyLib;
-using static ProtoFluxOverhaul.Logger;
 
 namespace ProtoFluxOverhaul;
 
@@ -52,18 +51,10 @@ public partial class ProtoFluxOverhaul
 					{
 						if (!pfoSlot.IsRemoved)
 							pfoSlot.Destroy();
-						Logger.LogWire("Cleanup", "Destroyed PFO child slot for wire (delete/removal)");
-					}
-					else
-					{
-						// Keep slot for transient teardown (pack/unpack / rebuild), but caches are cleared above.
-						Logger.LogWire("Cleanup", "Preserved PFO child slot for transient wire teardown (likely pack/unpack)");
 					}
 				}
 			}
-			catch (Exception e)
-			{
-				Logger.LogError("Error handling wire cleanup", e, LogCategory.Wire);
+			catch (Exception) {
 			}
 		}
 	}

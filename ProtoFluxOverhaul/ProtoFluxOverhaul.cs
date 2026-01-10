@@ -1,16 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using Elements.Assets;
 using Elements.Core;
 using FrooxEngine;
-using FrooxEngine.ProtoFlux;
-using FrooxEngine.UIX;
 using HarmonyLib;
 using Renderite.Shared;
 using ResoniteModLoader;
-using static ProtoFluxOverhaul.Logger;
 
 namespace ProtoFluxOverhaul;
 
@@ -27,8 +23,6 @@ public partial class ProtoFluxOverhaul : ResoniteMod {
 	// ============ BASIC SETTINGS ============
 	[AutoRegisterConfigKey] public static readonly ModConfigurationKey<dummy> SPACER_BASIC = new("spacerMain", "--- Main Settings ---", () => new dummy());
 	[AutoRegisterConfigKey] public static readonly ModConfigurationKey<bool> ENABLED = new("Enabled", "Should ProtoFluxOverhaul be Enabled?", () => true);
-	[AutoRegisterConfigKey] public static readonly ModConfigurationKey<bool> DEBUG_LOGGING = new("Enable Debug Logging", "Enable Debug Logging", () => false);
-	[AutoRegisterConfigKey] public static readonly ModConfigurationKey<bool> USE_PLATFORM_COLOR_PALETTE = new("Use PlatformColorPalette", "Attach PlatformColorPalette to each ProtoFlux node UI and drive header/background/overview Image.Tint via ValueCopy from the palette outputs", () => false);
 	[AutoRegisterConfigKey] public static readonly ModConfigurationKey<bool> AUTO_REBUILD_SELECTED_NODES = new("Auto Rebuild Selected Nodes", "When selecting ProtoFlux nodes, automatically rebuild them with ProtoFluxOverhaul styling (bypasses permission checks, not that this is only temporary and is reverted to the original behavior when the nodes are packed/unpacked).", () => false);
 
 	// ============ ANIMATION SETTINGS ============
@@ -64,35 +58,29 @@ public partial class ProtoFluxOverhaul : ResoniteMod {
 	private static bool HasPermission(Component component) {
 		try {
 			if (component == null || component.Slot == null) {
-				Logger.LogPermission("Check", false, "Permission check failed: component or slot is null");
 				return false;
 			}
 
 			// Get the component's slot owner (allocation info)
 			component.Slot.ReferenceID.ExtractIDs(out ulong slotPosition, out byte slotUser);
 			User slotAllocUser = component.World.GetUserByAllocationID(slotUser);
-			Logger.LogPermission("Slot Point", true, $"Slot allocation: Position={slotPosition}, UserID={slotUser}, User={slotAllocUser?.UserName}, Type={component.GetType().Name}");
 
 			// If the slot allocation isn't valid, fall back to component allocation.
 			if (slotAllocUser == null || slotPosition < slotAllocUser.AllocationIDStart) {
 				component.ReferenceID.ExtractIDs(out ulong componentPosition, out byte componentUser);
 				User componentAllocUser = component.World.GetUserByAllocationID(componentUser);
-				Logger.LogPermission("Instance", true, $"Instance allocation: Position={componentPosition}, UserID={componentUser}, User={componentAllocUser?.UserName}, Type={component.GetType().Name}");
 
 				bool hasPermission = (componentAllocUser != null &&
 					componentPosition >= componentAllocUser.AllocationIDStart &&
 					componentAllocUser == component.LocalUser);
 
-				Logger.LogPermission("Instance Check", hasPermission, $"Permission check (instance): Owner={componentAllocUser?.UserName}, IsLocalUser={componentAllocUser == component.LocalUser}, IsHost={component.LocalUser.IsHost}, Result={hasPermission}, Type={component.GetType().Name}");
 				return hasPermission;
 			}
 
 			bool result = slotAllocUser == component.LocalUser;
-			Logger.LogPermission("Slot Check", result, $"Permission check (slot): Owner={slotAllocUser?.UserName}, IsLocalUser={slotAllocUser == component.LocalUser}, IsHost={component.LocalUser.IsHost}, Result={result}, Type={component.GetType().Name}");
 			return result;
-		} catch (Exception e) {
+		} catch (Exception) {
 			// If anything goes wrong, deny permission to be safe
-			Logger.LogError("Permission check error", e, LogCategory.Permission);
 			return false;
 		}
 	}
@@ -101,12 +89,8 @@ public partial class ProtoFluxOverhaul : ResoniteMod {
 		Config = GetConfiguration();
 		Config.Save(true);
 
-		Harmony harmony = new Harmony("com.Dexy.ProtoFluxOverhaul");
+		Harmony harmony = new("com.Dexy.ProtoFluxOverhaul");
 		harmony.PatchAll();
-
-		// Always log startup regardless of debug settings
-		ResoniteMod.Msg("[ProtoFluxOverhaul] Mod loaded successfully - Harmony patches applied");
-		Logger.LogUI("Startup", "ProtoFluxOverhaul successfully loaded and patched");
 
 		Config.OnThisConfigurationChanged += (k) => {
 			if (k.Key != ENABLED) {
@@ -126,7 +110,6 @@ public partial class ProtoFluxOverhaul : ResoniteMod {
 							panner.Repeat = Config.GetValue(SCROLL_REPEAT);
 						} catch (System.NullReferenceException) {
 							// Skip this panner if it's not properly initialized
-							Logger.LogWarning($"Skipping uninitialized Panner2D on {kvp.Key.Name}");
 							continue;
 						}
 
@@ -140,8 +123,7 @@ public partial class ProtoFluxOverhaul : ResoniteMod {
 
 								var nearTexture = GetOrCreateSharedTexture(pfoSlot, Config.GetValue(WIRE_TEXTURE));
 								fresnelMaterial.NearTexture.Target = nearTexture;
-							} catch (Exception ex) {
-								Logger.LogError($"Error updating textures for panner on slot {pfoSlot.Name}", ex, LogCategory.UI);
+							} catch (Exception) {
 							}
 						}
 					}

@@ -35,8 +35,7 @@ public partial class ProtoFluxOverhaul
 	/// </summary>
 	private static StaticTexture2D GetOrCreateSharedTexture(Slot slot, Uri uri)
 	{
-		if (slot == null)
-			throw new ArgumentNullException(nameof(slot));
+		ArgumentNullException.ThrowIfNull(slot);
 
 		StaticTexture2D texture = slot.GetComponentOrAttach<StaticTexture2D>();
 		texture.URL.Value = uri;
