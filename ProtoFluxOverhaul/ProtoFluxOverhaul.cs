@@ -23,7 +23,6 @@ public partial class ProtoFluxOverhaul : ResoniteMod {
 	// ============ BASIC SETTINGS ============
 	[AutoRegisterConfigKey] public static readonly ModConfigurationKey<dummy> SPACER_BASIC = new("spacerMain", "--- Main Settings ---", () => new dummy());
 	[AutoRegisterConfigKey] public static readonly ModConfigurationKey<bool> ENABLED = new("Enabled", "Should ProtoFluxOverhaul be Enabled?", () => true);
-	[AutoRegisterConfigKey] public static readonly ModConfigurationKey<bool> AUTO_REBUILD_SELECTED_NODES = new("Auto Rebuild Selected Nodes", "When selecting ProtoFlux nodes, automatically rebuild them with ProtoFluxOverhaul styling (bypasses permission checks, not that this is only temporary and is reverted to the original behavior when the nodes are packed/unpacked).", () => false);
 
 	// ============ ANIMATION SETTINGS ============
 	[AutoRegisterConfigKey] public static readonly ModConfigurationKey<dummy> SPACER_ANIMATION = new("spacerAnimation", "--- Animation Settings ---", () => new dummy());
@@ -91,44 +90,5 @@ public partial class ProtoFluxOverhaul : ResoniteMod {
 
 		Harmony harmony = new("com.Dexy.ProtoFluxOverhaul");
 		harmony.PatchAll();
-
-		Config.OnThisConfigurationChanged += (k) => {
-			if (k.Key != ENABLED) {
-				Engine.Current.GlobalCoroutineManager.StartTask(async () => {
-					await default(ToWorld);
-					foreach (var kvp in _pannerCache.ToList()) {
-						var panner = kvp.Value;
-						if (panner == null || panner.IsRemoved) {
-							// Clean up stale cache entries
-							_pannerCache.Remove(kvp.Key);
-							continue;
-						}
-
-						// Ensure the panner is properly initialized before setting properties
-						try {
-							panner.Speed = Config.GetValue(SCROLL_SPEED);
-							panner.Repeat = Config.GetValue(SCROLL_REPEAT);
-						} catch (System.NullReferenceException) {
-							// Skip this panner if it's not properly initialized
-							continue;
-						}
-
-						// Panner/material/texture live on the PFO child slot
-						var pfoSlot = kvp.Key;
-						var fresnelMaterial = pfoSlot.GetComponent<FresnelMaterial>();
-						if (fresnelMaterial != null) {
-							try {
-								var farTexture = GetOrCreateSharedTexture(pfoSlot, Config.GetValue(WIRE_TEXTURE));
-								fresnelMaterial.FarTexture.Target = farTexture;
-
-								var nearTexture = GetOrCreateSharedTexture(pfoSlot, Config.GetValue(WIRE_TEXTURE));
-								fresnelMaterial.NearTexture.Target = nearTexture;
-							} catch (Exception) {
-							}
-						}
-					}
-				});
-			}
-		};
 	}
 }
