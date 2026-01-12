@@ -1,4 +1,7 @@
 using System;
+
+using Elements.Core;
+
 using FrooxEngine;
 using FrooxEngine.ProtoFlux;
 using HarmonyLib;
@@ -13,19 +16,10 @@ public partial class ProtoFluxOverhaul
 	{
 		[HarmonyPatch("OnDestroy")]
 		[HarmonyPostfix]
-		public static void OnDestroy_Postfix(ProtoFluxWireManager __instance, SyncRef<MeshRenderer> ____renderer)
-		{
-			try
-			{
-				// removing deleted renderers since they no longer need to be checked
-				var renderer = ____renderer?.Target;
-				if (renderer != null)
-				{
-					_materialCache.Remove(renderer);
-				}
-			}
-			catch (Exception) {
-			}
+		public static void OnDestroy_Postfix(ProtoFluxWireManager __instance, SyncRef<MeshRenderer> ____renderer) {
+			// syncref/meshrenderer is already destroyed..
+			static bool predicate(MeshRenderer p) { return p == null || p.IsRemoved; }
+			_rendererCache.RemoveAll(predicate);
 		}
 	}
 }
