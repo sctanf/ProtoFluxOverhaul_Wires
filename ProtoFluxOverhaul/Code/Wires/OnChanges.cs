@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 
 using Elements.Core;
 
@@ -104,7 +105,7 @@ public partial class ProtoFluxOverhaul
 				TryIsOutputWire(__instance, ____wireMesh.Target, out bool isOutputDir);
 
 				// checking if the renderer is already setup
-				if (!_rendererCache.Contains(renderer) || renderer.Material.Target == null || renderer.Material.Target.IsRemoved)
+				if (!_rendererCache.TryGetValue(renderer, out object o) || renderer.Material.Target == null || renderer.Material.Target.IsRemoved)
 				{
 					// what does this do? the original check does not make sense to me either
 					if (renderer.Material.Target is not FresnelMaterial originalMaterial) {
@@ -117,8 +118,7 @@ public partial class ProtoFluxOverhaul
 						// TODO: does its material exist? maybe try to break the drive otherwise
 						UniLog.Log("Ignore already driven material");
 						// add to cache to ignore later
-						if (!_rendererCache.Contains(renderer))
-							_rendererCache.AddUnique(renderer);
+						_rendererCache.TryAdd(renderer, null);
 						return;
 					}
 
@@ -164,8 +164,7 @@ public partial class ProtoFluxOverhaul
 					renderer.Material.Target = _materialCache[isOutputDir];
 
 					// finally put the renderer in cache to ignore next time
-					if (!_rendererCache.Contains(renderer))
-						_rendererCache.AddUnique(renderer);
+					_rendererCache.TryAdd(renderer, null);
 				}
 
 				// now actually assign things

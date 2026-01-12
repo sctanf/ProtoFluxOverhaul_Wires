@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 using Elements.Core;
 
@@ -16,7 +17,7 @@ public partial class ProtoFluxOverhaul
 	private static readonly Dictionary<bool, FresnelMaterial> _materialCache = new();
 	private static readonly Dictionary<bool, ValueDriver<float2>> _driverCache = new();
 	private static World currentWorld = null; // i am very good at this
-	private static readonly List<MeshRenderer> _rendererCache = new();
+	private static readonly ConditionalWeakTable<MeshRenderer, object> _rendererCache = new();
 
 	/// <summary>
 	/// Gets or creates the child slot for all ProtoFluxOverhaul components on a wire.
