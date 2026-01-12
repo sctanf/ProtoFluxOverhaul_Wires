@@ -36,20 +36,14 @@ public partial class ProtoFluxOverhaul
 			}
 			return false;
 		}
-		private static void SetupMaterial(Slot pfoSlot, Slot matSlot, FresnelMaterial originalMaterial, bool direction) {
+		private static void SetupMaterial(Slot pfoSlot, Slot matSlot, bool direction) {
 			// Create a new material on the PFO slot
 			var newMaterial = matSlot.AttachComponent<FresnelMaterial>();
-			newMaterial.NearColor.Value = colorX.White;
 			newMaterial.FarColor.Value = colorX.White;
-			newMaterial.Sidedness.Value = originalMaterial.Sidedness.Value;
-			newMaterial.UseVertexColors.Value = originalMaterial.UseVertexColors.Value;
-			newMaterial.BlendMode.Value = originalMaterial.BlendMode.Value;
-			// newMaterial.ZWrite.Value = originalMaterial.ZWrite.Value;
+			newMaterial.Sidedness.Value = Sidedness.Double;
+			newMaterial.UseVertexColors.Value = true;
+			newMaterial.BlendMode.Value = BlendMode.Alpha;
 			newMaterial.ZWrite.Value = ZWrite.Off; // may cause z errors but renders wires behind transparency
-			newMaterial.NearTextureScale.Value = originalMaterial.NearTextureScale.Value;
-			newMaterial.NearTextureOffset.Value = originalMaterial.NearTextureOffset.Value;
-			newMaterial.FarTextureScale.Value = originalMaterial.FarTextureScale.Value;
-			newMaterial.FarTextureOffset.Value = originalMaterial.FarTextureOffset.Value;
 			newMaterial.PolarPower.Value = direction ? 1f : 0f; // flag direction
 			_materialCache[direction] = newMaterial;
 
@@ -107,11 +101,6 @@ public partial class ProtoFluxOverhaul
 				// checking if the renderer is already setup
 				if (!_rendererCache.TryGetValue(renderer, out object o) || renderer.Material.Target == null || renderer.Material.Target.IsRemoved)
 				{
-					// what does this do? the original check does not make sense to me either
-					if (renderer.Material.Target is not FresnelMaterial originalMaterial) {
-						return;
-					}
-
 					// check if the renderer is driven by something else (because we cant write to that)
 					if (renderer.Material.IsDriven)
 					{
@@ -152,10 +141,10 @@ public partial class ProtoFluxOverhaul
 						// now create anything missing..
 						// TODO: everything will explode horribly if other components are missing for some reason but its probably not gonna happen
 						if (!_materialCache.TryGetValue(true, out FresnelMaterial value) || value.IsRemoved) {
-							SetupMaterial(pfoSlot, matSlot, originalMaterial, true);
+							SetupMaterial(pfoSlot, matSlot, true);
 						}
 						if (!_materialCache.TryGetValue(false, out FresnelMaterial value1) || value1.IsRemoved) {
-							SetupMaterial(pfoSlot, matSlot, originalMaterial, false);
+							SetupMaterial(pfoSlot, matSlot, false);
 						}
 					}
 
